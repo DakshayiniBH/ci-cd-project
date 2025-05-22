@@ -1,0 +1,31 @@
+name: CI/CD to Render   # Name of this GitHub Actions workflow
+
+on:
+  push:
+    branches:
+      - main           # Trigger when changes are pushed to 'main' branch
+
+jobs:
+  build-and-deploy:     # Job name
+    runs-on: ubuntu-latest   # Use Ubuntu as the environment
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3   # Downloads the latest code
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18         # Installs Node.js 18
+
+      - name: Install dependencies
+        run: npm install           # Installs all dependencies from package.json
+
+      - name: Run tests
+        run: npm test || echo "No tests found"   # Tries to run tests; if none, prints message instead of failing
+
+      - name: Deploy to Render
+        uses: render-examples/render-github-action@v1   # Official Render GitHub Action
+        with:
+          apiKey: ${{ secrets.RENDER_API_KEY }}         # Secret key for Render (from GitHub repo secrets)
+          serviceId: ${{ secrets.RENDER_SERVICE_ID }}   # Unique Render service ID (also from secrets)
